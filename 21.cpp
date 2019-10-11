@@ -28,62 +28,74 @@ struct baralho carta[52];
 int quantcartas = 52;
 int totalJogador = 0;
 int totalMesa = 0;
+int continua = 1;
 
 
 int main (){
 
     setlocale(LC_ALL, "Portuguese");
-   
-    criabaralho();
-
-    //imprimecartas();
-
-    //int comeca;
-    //comeca = quemcomeca();
-
-    int meuplacar = 0;
-    int placarDelay = 0;
 
     do {
+   
+        criabaralho();
+        quantcartas = 52;
 
-        minhavez();
+        //imprimecartas();
 
-        cout << endl << "   OK!! você pontuou " << totalJogador << " nessa rodada;" << endl;
-        cout << "   Vamos ver como me saio, é a vez do Delay !!!" << endl;
+        //int comeca;
+        //comeca = quemcomeca();
 
-        if (totalJogador > 21){
+        int meuplacar = 0;
+        int placarDelay = 0;
+
+        do {
+
+            minhavez();
+
+            cout << endl << "   OK!! você pontuou " << totalJogador << " nessa rodada;" << endl;
+            cout << "   Vamos ver como me saio, é a vez do Delay !!!" << endl;
+
+            if (totalJogador > 21){
+                totalJogador = 0;
+            }
+
+            vezDelay();
+
+            if (totalMesa > 21){
+                totalMesa = 0;
+            }
+
+            if (totalMesa > totalJogador){
+                cout << "Você fez " << totalJogador << ", e eu fiz " << totalMesa << endl;
+                cout << "Um ponto para mim." << endl;
+                placarDelay++;
+            } else if (totalJogador > totalMesa){
+                cout << "Parabéns !!! Você fez " << totalJogador << ", e eu fiz " << totalMesa << endl;
+                cout << "Ponto para você." << endl;
+                meuplacar++;
+            } else if (totalMesa == totalJogador){
+                cout << "Você fez " << totalJogador << ", e eu fiz " << totalMesa << endl;
+                cout << "Empate nessa rodada, ninguém pontua." << endl;
+            }
+
+            cout << endl << "   O placar está: " << endl;
+            cout << "   PLACAR JOGADOR = " << meuplacar << endl;
+            cout << "   PLACAR DELAY = " << placarDelay << endl << endl;
+            cout << quantcartas << endl;
+
             totalJogador = 0;
-        }
-
-        vezDelay();
-
-        if (totalMesa > 21){
             totalMesa = 0;
-        }
 
-        if (totalMesa > totalJogador){
-            cout << "Você fez " << totalJogador << ", e eu fiz " << totalMesa << endl;
-            cout << "Um ponto para mim." << endl;
-            placarDelay++;
-        } else if (totalJogador > totalMesa){
-            cout << "Parabéns !!! Você fez " << totalJogador << ", e eu fiz " << totalMesa << endl;
-            cout << "Ponto para você." << endl;
-            meuplacar++;
-        } else if (totalMesa == totalJogador){
-            cout << "Você fez " << totalJogador << ", e eu fiz " << totalMesa << endl;
-            cout << "Empate nessa rodada, ambos pontuam." << endl;
-            meuplacar++;
-            placarDelay++;
-        }
+        } while (quantcartas > 0);
 
-    cout << endl << "   O placar está: " << endl;
-    cout << "   PLACAR JOGADOR = " << meuplacar << endl;
-    cout << "   PLACAR DELAY = " << placarDelay << endl << endl;
+        cout << "   Sem cartas no baralho, fim de jogo!" << endl;
+        cout << "RESULTADO FINAL: " << endl;
+        cout << "JOGADOR = " << meuplacar << "      MESA = " << placarDelay << endl << endl;
+        cout << "Deseja jogar mais uma partida? " << endl;
+        cout << "[ 1 ] - Para sim" << endl << "[ 0 ] - Para não " << endl;
+        cin >> continua;
 
-    totalJogador = 0;
-    totalMesa = 0;
-
-    } while (quantcartas > 0);
+    } while (continua == 1);
 
     return 0;
 }
@@ -142,7 +154,14 @@ void imprimecartas(){
 
 int sorteiacarta(){
     srand(time(NULL));
-    int num = rand() % 52;
+    int num = rand() % quantcartas;
+
+        for (int i = num; i < num; i++ ){
+        carta[i] = carta[i+1];
+        }
+
+    quantcartas--;
+
     return num;
 }
 
@@ -249,7 +268,7 @@ void imprimeCarta(int i){
         break;
     case 5:
         cout << " ___________" << endl;
-        cout << "|  CINCO   |" << endl;
+        cout << "|  CINCO    |" << endl;
         cout << "|           |" << endl;
         cout << "| 555555555 |" << endl;
         cout << "| 55        |" << endl;
@@ -314,7 +333,7 @@ void imprimeCarta(int i){
         cout << "|  9999999  |" << endl;
         cout << "| 99     99 |" << endl;
         cout << "| 99     99 |" << endl;
-        cout << "|  9999999  |" << endl;
+        cout << "|  99999999 |" << endl;
         cout << "|        99 |" << endl;
         cout << "|        99 |" << endl;
         cout << "|        99 |" << endl;
@@ -398,6 +417,18 @@ int minhavez(){ // A vez do jogador humano
     {
         int cartasorteada;
         cartasorteada = sorteiacarta();
+
+        if (carta[cartasorteada].valor == 1){
+            cout << endl << "Você tirou um Ás, Deseja que ele tenha valor de 1 ponto ou de 11?" << endl;
+            int escolhaAs = 0;
+            cout << "[ 1 ] - Para esse Ás valer 1 ponto;" << endl;
+            cout << "[ 2 ] - Para esse Ás valer 11 pontos;" << endl;
+            cin >> escolhaAs;
+            if (escolhaAs == 2){
+                totalJogador = totalJogador + 10;
+            }
+        }
+
         totalJogador = totalJogador + carta[cartasorteada].valor;
         
         // Se marcar 21 pontos;
@@ -421,14 +452,22 @@ int minhavez(){ // A vez do jogador humano
         }
         
        
-    } while ( parar == 1);
+    } while ( parar == 1 && quantcartas != 0);
+
+    if (quantcartas == 0){
+        totalJogador = 0;
+    }
     
 }
 
 int vezDelay(){ 
 
-    cout << totalJogador << endl;
-    cout << totalMesa << endl;
+    if(quantcartas == 0) {
+        cout << endl << "As cartas acabaram, ninguém pontuará nessa rodada;" << endl;
+        totalMesa = 0;
+        return 0;
+
+    }
 
     cout << endl << "   Tecle enter para eu pegar minhaca carta, por favor " << endl;
     getchar();
@@ -438,6 +477,12 @@ int vezDelay(){
     {
         int cartasorteada;
         cartasorteada = sorteiacarta();
+
+        if (carta[cartasorteada].valor == 1 && totalMesa <= 10){
+                cout << "   Meu Ás valerá 11 pontos nessa rodada;" << endl;
+                totalMesa = totalMesa + 10;
+        }
+
         totalMesa = totalMesa + carta[cartasorteada].valor;
         
         // Se marcar 21 pontos;
